@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#171717">
+<title>الحاسبة المالية للمدرسة القرآنية</title>
+<style>
+:root{--ink:#20201f;--muted:#77746d;--gold:#b28b4c;--gold-light:#f5efe4;--line:#e9e5dd;--bg:#f7f6f3;--white:#fff;--green:#287653;--red:#a94442}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Tahoma,Arial,sans-serif}
+.wrap{max-width:1050px;margin:auto;padding:22px 16px 40px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:20px}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:44px;height:44px;border-radius:14px;background:#222;color:#e7c88e;display:grid;place-items:center;font-size:22px}
+h1{font-size:20px;margin:0 0 5px}
+.sub{color:var(--muted);font-size:12px}
+.monthbox{display:flex;align-items:center;gap:8px;background:white;border:1px solid var(--line);padding:9px 12px;border-radius:12px}
+.monthbox label{font-size:12px;color:var(--muted)}
+input,button{font:inherit}
+input[type=month]{border:0;background:transparent;color:var(--ink);font-weight:bold;outline:none}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+.stat{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:16px}
+.stat .label{font-size:12px;color:var(--muted);margin-bottom:9px}
+.stat .value{font-size:clamp(18px,3vw,25px);font-weight:800;direction:ltr;text-align:right;white-space:nowrap}
+.stat.total .value{color:var(--gold)}
+.stat.teacher .value{color:var(--green)}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:18px 0 12px;flex-wrap:wrap}
+.toolbar h2{font-size:17px;margin:0}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+button{border:0;border-radius:10px;padding:10px 14px;cursor:pointer;font-weight:bold}
+.primary{background:#222;color:white}
+.secondary{background:var(--gold-light);color:#76572a;border:1px solid #eadcc5}
+.ghost{background:white;border:1px solid var(--line);color:var(--ink)}
+.danger{background:#fff3f2;color:var(--red);border:1px solid #f0d5d2;padding:7px 10px}
+.table-wrap{background:white;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+table{width:100%;border-collapse:collapse;min-width:720px}
+th{background:#faf9f6;color:#68645c;font-size:12px;font-weight:bold;padding:13px 10px;text-align:center;border-bottom:1px solid var(--line)}
+td{padding:10px 8px;border-bottom:1px solid #f0eee9;text-align:center;font-size:13px}
+tr:last-child td{border-bottom:0}
+td input{width:100%;min-width:62px;border:1px solid #e8e4dc;border-radius:8px;padding:9px 7px;text-align:center;background:#fffdfa;outline:none}
+td input:focus{border-color:var(--gold);box-shadow:0 0 0 2px #b28b4c20}
+td .name{min-width:135px;text-align:right}
+.money{font-weight:bold;white-space:nowrap}
+.teacher-money{color:var(--green)}
+.admin-money{color:#76572a}
+.total-row{background:#faf9f6;font-weight:bold}
+.hint{font-size:12px;color:var(--muted);line-height:1.8;margin:10px 2px}
+.bottom-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.history{margin-top:28px;background:white;border:1px solid var(--line);border-radius:16px;padding:16px}
+.history h2{font-size:17px;margin:0 0 12px}
+.history-empty{color:var(--muted);font-size:13px}
+.history-item{border-top:1px solid var(--line);padding:12px 0;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.history-item:first-of-type{border-top:0}
+.history-item strong{font-size:14px}
+.history-item small{display:block;color:var(--muted);margin-top:5px}
+.history-buttons{display:flex;gap:7px}
+.history-buttons button{padding:7px 10px;font-size:12px}
+footer{text-align:center;color:#99958d;font-size:11px;margin-top:20px}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#222;color:white;padding:11px 16px;border-radius:12px;font-size:13px;opacity:0;pointer-events:none;transition:.2s}
+.toast.show{opacity:1}
+@media(max-width:650px){.wrap{padding:16px 10px 30px}header{align-items:flex-start;flex-direction:column}.monthbox{width:100%;justify-content:space-between}.summary{gap:7px}.stat{padding:12px 9px;border-radius:12px}.stat .label{font-size:10px;min-height:28px}.stat .value{font-size:16px}.toolbar{align-items:flex-start}.toolbar h2{padding-top:8px}.actions button{font-size:12px;padding:9px 10px}}
+@media print{body{background:white}.wrap{max-width:none;padding:0}.actions,.bottom-actions,.danger,footer,.history{display:none!important}.table-wrap,.stat{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+ <div class="brand"><div class="logo">✦</div><div><h1>الحاسبة المالية للمدرسة القرآنية</h1><div class="sub">حساب مستحقات الأستاذات ونصيب الإدارة</div></div></div>
+ <div class="monthbox"><label for="month">الشهر</label><input id="month" type="month"></div>
+</header>
+
+<section class="summary">
+ <div class="stat total"><div class="label">إجمالي مداخيل المدرسة</div><div class="value" id="grandTotal">0 دج</div></div>
+ <div class="stat teacher"><div class="label">مجموع مستحقات الأستاذات</div><div class="value" id="teacherTotal">0 دج</div></div>
+ <div class="stat"><div class="label">مجموع نصيب الإدارة</div><div class="value" id="adminTotal">0 دج</div></div>
+</section>
+
+<div class="toolbar">
+ <h2>قائمة الأستاذات</h2>
+ <div class="actions">
+  <button class="secondary" id="addBtn">＋ إضافة أستاذة</button>
+  <button class="ghost" id="printBtn">طباعة الكشف</button>
+ </div>
+</div>
+
+<div class="table-wrap">
+<table>
+<thead><tr>
+ <th style="width:22%">اسم الأستاذة</th>
+ <th>طلبة ساعة<br><small>3500 دج</small></th>
+ <th>طلبة نصف ساعة<br><small>1800 دج</small></th>
+ <th>طلبة الكبار<br><small>2200 دج</small></th>
+ <th>مستحقات الأستاذة</th>
+ <th>نصيب الإدارة</th>
+ <th>حذف</th>
+</tr></thead>
+<tbody id="rows"></tbody>
+<tfoot><tr class="total-row">
+ <td>المجموع</td><td id="sumHour">0</td><td id="sumHalf">0</td><td id="sumAdult">0</td>
+ <td class="money teacher-money" id="sumTeacher">0 دج</td><td class="money admin-money" id="sumAdmin">0 دج</td><td>—</td>
+</tr></tfoot>
+</table>
+</div>
+<p class="hint">الحساب تلقائي: ساعة (1500 للأستاذة / 2000 للإدارة)، نصف ساعة (700 / 1100)، الكبار (1000 / 1200). تُحفظ التغييرات تلقائياً على هذا الجهاز والمتصفح.</p>
+
+<div class="bottom-actions">
+ <button class="primary" id="archiveBtn">حفظ الشهر وبدء شهر جديد</button>
+ <button class="ghost" id="exportBtn">تصدير كشف CSV</button>
+</div>
+
+<section class="history">
+ <h2>الأشهر المحفوظة</h2>
+ <div id="historyList" class="history-empty">لا توجد أشهر محفوظة بعد.</div>
+</section>
+<footer>بيانات الحاسبة محفوظة محلياً على هذا الجهاز والمتصفح. احتفظي بنسخة CSV عند الحاجة.</footer>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const KEY='quran_school_finance_v1';
+const rates={hour:{pay:3500,teacher:1500,admin:2000},half:{pay:1800,teacher:700,admin:1100},adult:{pay:2200,teacher:1000,admin:1200}};
+const $=id=>document.getElementById(id);
+const monthNow=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')};
+let state=load();
+function blankTeacher(name='أستاذة جديدة'){return {id:crypto.randomUUID?crypto.randomUUID():String(Date.now()+Math.random()),name,hour:0,half:0,adult:0}}
+function load(){try{const x=JSON.parse(localStorage.getItem(KEY));if(x&&Array.isArray(x.teachers))return x}catch(e){}return {month:monthNow(),teachers:Array.from({length:20},(_,i)=>blankTeacher('الأستاذة '+(i+1))),history:[]}}
+function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+function n(v){return Math.max(0,Math.floor(Number(v)||0))}
+function fmt(v){return Math.round(v).toLocaleString('fr-FR')+' دج'}
+function calc(t){let h=n(t.hour),m=n(t.half),a=n(t.adult);return {income:h*3500+m*1800+a*2200,teacher:h*1500+m*700+a*1000,admin:h*2000+m*1100+a*1200}}
+function toast(s){$('toast').textContent=s;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2100)}
+function render(){
+ $('month').value=state.month||monthNow();
+ const body=$('rows');body.innerHTML='';
+ let sh=0,sm=0,sa=0,st=0,sad=0,si=0;
+ state.teachers.forEach((t,i)=>{
+  const c=calc(t);sh+=n(t.hour);sm+=n(t.half);sa+=n(t.adult);st+=c.teacher;sad+=c.admin;si+=c.income;
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td><input class="name" aria-label="اسم الأستاذة" value="${esc(t.name)}" data-id="${t.id}" data-field="name"></td>
+  <td><input type="number" min="0" step="1" value="${n(t.hour)}" data-id="${t.id}" data-field="hour"></td>
+  <td><input type="number" min="0" step="1" value="${n(t.half)}" data-id="${t.id}" data-field="half"></td>
+  <td><input type="number" min="0" step="1" value="${n(t.adult)}" data-id="${t.id}" data-field="adult"></td>
+  <td class="money teacher-money">${fmt(c.teacher)}</td><td class="money admin-money">${fmt(c.admin)}</td>
+  <td><button class="danger" data-delete="${t.id}" title="حذف الأستاذة">حذف</button></td>`;
+  body.appendChild(tr);
+ });
+ $('sumHour').textContent=sh;$('sumHalf').textContent=sm;$('sumAdult').textContent=sa;
+ $('sumTeacher').textContent=fmt(st);$('sumAdmin').textContent=fmt(sad);
+ $('grandTotal').textContent=fmt(si);$('teacherTotal').textContent=fmt(st);$('adminTotal').textContent=fmt(sad);
+ renderHistory();
+}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+$('rows').addEventListener('input',e=>{
+ const el=e.target;if(!el.dataset.id)return;
+ const t=state.teachers.find(x=>x.id===el.dataset.id);if(!t)return;
+ t[el.dataset.field]=el.dataset.field==='name'?el.value:n(el.value);
+ save();renderTotalsOnly();
+});
+$('rows').addEventListener('change',e=>{
+ const el=e.target;if(!el.dataset.id)return;
+ const t=state.teachers.find(x=>x.id===el.dataset.id);if(!t)return;
+ if(el.dataset.field!=='name'){t[el.dataset.field]=n(el.value);el.value=t[el.dataset.field]}
+ save();render();
+});
+$('rows').addEventListener('click',e=>{
+ const id=e.target.dataset.delete;if(!id)return;
+ const t=state.teachers.find(x=>x.id===id);
+ if(!confirm('هل تريدين حذف '+(t?.name||'هذه الأستاذة')+'؟'))return;
+ state.teachers=state.teachers.filter(x=>x.id!==id);save();render();
+});
+function renderTotalsOnly(){let sh=0,sm=0,sa=0,st=0,sad=0,si=0;
+ state.teachers.forEach(t=>{let c=calc(t);sh+=n(t.hour);sm+=n(t.half);sa+=n(t.adult);st+=c.teacher;sad+=c.admin;si+=c.income});
+ $('sumHour').textContent=sh;$('sumHalf').textContent=sm;$('sumAdult').textContent=sa;
+ $('sumTeacher').textContent=fmt(st);$('sumAdmin').textContent=fmt(sad);
+ $('grandTotal').textContent=fmt(si);$('teacherTotal').textContent=fmt(st);$('adminTotal').textContent=fmt(sad);
+}
+$('addBtn').onclick=()=>{state.teachers.push(blankTeacher('أستاذة جديدة'));save();render();$('rows').lastElementChild?.querySelector('.name')?.focus();toast('تمت إضافة أستاذة')};
+$('month').onchange=e=>{state.month=e.target.value||monthNow();save();render();};
+$('printBtn').onclick=()=>window.print();
+function snapshot(){let sums={income:0,teacher:0,admin:0};state.teachers.forEach(t=>{let c=calc(t);sums.income+=c.income;sums.teacher+=c.teacher;sums.admin+=c.admin});
+ return {month:state.month,teachers:state.teachers.map(t=>({...t})),sums,savedAt:new Date().toISOString()}}
+$('archiveBtn').onclick=()=>{
+ if(!confirm('سيتم حفظ كشف هذا الشهر في الأرشيف ثم تصفير أعداد الطلبة لبدء شهر جديد. هل تريدين المتابعة؟'))return;
+ const snap=snapshot();state.history=state.history.filter(x=>x.month!==snap.month);state.history.unshift(snap);
+ state.teachers=state.teachers.map(t=>({...t,hour:0,half:0,adult:0}));
+ const d=new Date((state.month||monthNow())+'-01T12:00:00');d.setMonth(d.getMonth()+1);state.month=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+ save();render();toast('تم حفظ الشهر وبدء شهر جديد');
+};
+function renderHistory(){const box=$('historyList');if(!state.history.length){box.className='history-empty';box.textContent='لا توجد أشهر محفوظة بعد.';return}
+ box.className='';
+ box.innerHTML=state.history.map((x,i)=>`<div class="history-item"><div><strong>${esc(x.month)}</strong><small>المداخيل: ${fmt(x.sums.income)} · الأستاذات: ${fmt(x.sums.teacher)} · الإدارة: ${fmt(x.sums.admin)}</small></div><div class="history-buttons"><button class="ghost" data-view="${i}">عرض</button><button class="danger" data-delhistory="${i}">حذف</button></div></div>`).join('');
+}
+$('historyList').addEventListener('click',e=>{
+ if(e.target.dataset.view!==undefined){let x=state.history[Number(e.target.dataset.view)];if(!x)return;let lines=[`كشف شهر ${x.month}`,'اسم الأستاذة,ساعة,نصف ساعة,كبار,مستحقات الأستاذة,نصيب الإدارة'];x.teachers.forEach(t=>{let c=calc(t);lines.push([t.name,n(t.hour),n(t.half),n(t.adult),c.teacher,c.admin].join(','))});lines.push(`الإجمالي,,,,${x.sums.teacher},${x.sums.admin}`,`إجمالي المداخيل,${x.sums.income}`);download('\ufeff'+lines.join('\n'),`كشف-${x.month}.csv`);toast('تم تنزيل كشف الشهر المحفوظ')}
+ if(e.target.dataset.delhistory!==undefined){let i=Number(e.target.dataset.delhistory);if(confirm('حذف هذا الشهر المحفوظ نهائياً؟')){state.history.splice(i,1);save();renderHistory()}}
+});
+function download(content,name){const blob=new Blob([content],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;a.click();URL.revokeObjectURL(url)}
+$('exportBtn').onclick=()=>{let lines=[`كشف شهر ${state.month}`,'اسم الأستاذة,طلبة ساعة,طلبة نصف ساعة,طلبة الكبار,إجمالي المداخيل,مستحقات الأستاذة,نصيب الإدارة'];state.teachers.forEach(t=>{let c=calc(t);lines.push([t.name,n(t.hour),n(t.half),n(t.adult),c.income,c.teacher,c.admin].join(','))});let c=state.teachers.reduce((s,t)=>{let x=calc(t);s.i+=x.income;s.t+=x.teacher;s.a+=x.admin;return s},{i:0,t:0,a:0});lines.push(['الإجمالي','','', '',c.i,c.t,c.a].join(','));download('\ufeff'+lines.join('\n'),`كشف-المدرسة-${state.month}.csv`);toast('تم تصدير الكشف')};
+save();render();
+</script>
+</body>
+</html>
